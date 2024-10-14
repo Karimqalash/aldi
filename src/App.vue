@@ -10,6 +10,10 @@ const isLoading = ref(false);
 const errorMessage = ref('');
 const books = ref([]);
 
+const addBook = (newBook) => {
+  books.value.push(newBook);
+}
+
 onMounted(async () => {
   try {
     isLoading.value = true;
@@ -26,7 +30,7 @@ onMounted(async () => {
   <div class="c-wrapper">
     <div class="c-header">
       <h1>Home Page</h1>
-      <AddBookButton />
+      <AddBookButton @add-book="addBook" />
     </div>
     <div v-if="isLoading">Loading...</div>
     <div v-else-if="errorMessage">{{ errorMessage }}</div>
