@@ -11,6 +11,15 @@
           <label :for="group.key">{{ group.label }}</label>
           <input v-model="group.value" :type="group.type" :id="group.key" maxlength="48" required />
         </div>
+        <div class="c-modal-form__group">
+          <label>Ratings</label>
+          <button type="button" @click="addRating">Add Rating</button>
+          <div v-for="(rating, index) in ratings" :key="index" class="c-modal-form__group-rating">
+            <input v-model="rating.source" placeholder="Source (optional)" />
+            <input v-model="rating.value" type="number" placeholder="Value" required />
+            <button type="button" @click="removeRating(index)">Remove</button>
+          </div>
+        </div>
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
@@ -50,21 +59,24 @@ const formGroups = {
     type: 'text',
     value: ''
   },
-  ratings: {
-    label: 'Ratings',
-    key: 'name',
-    type: 'text',
-    value: ''
-  },
 };
 
 const form = ref(formGroups);
+const ratings = ref([]);
 const isLoading = ref(false);
 const errorMessage = ref('');
 
 const emits = defineEmits(['close','add-book']);
 const closeModal = () => {
   emits('close');
+};
+
+const addRating = () => {
+  ratings.value.push({ source: '', value: null });
+};
+
+const removeRating = (index) => {
+  ratings.value.splice(index, 1);
 };
 
 const validateForm = () => {
@@ -87,7 +99,7 @@ const submitForm = async () => {
     author: form.value.author.value,
     publishYear: form.value.publishYear.value,
     category: form.value.category.value,
-    ratings: form.value.ratings.value || [],
+    ratings: ratings.value || [],
   };
 
   try {
@@ -104,6 +116,7 @@ const submitForm = async () => {
 onUnmounted(() => {
   errorMessage.value = '';
   form.value = formGroups;
+  ratings.value = [];
 });
 </script>
 
@@ -125,7 +138,7 @@ onUnmounted(() => {
   background-color: white;
   padding: 20px;
   border-radius: 5px;
-  max-width: 500px;
+  max-width: 538px;
   width: 100%;
 }
 
@@ -150,6 +163,7 @@ onUnmounted(() => {
 
 .c-modal-form__group {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   font-size: 1rem;
   width: 100%;
@@ -164,6 +178,12 @@ onUnmounted(() => {
   height: 32px;
   padding: 0.5rem;
   flex: 1 1 auto;
+}
+
+.c-modal-form__group-rating {
+  display: flex;
+  gap: 12px;
+  margin: 10px 0;
 }
 
 .error {
